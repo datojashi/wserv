@@ -36,7 +36,7 @@ pub mod client{
     }
 
     impl Client {
-        pub fn on_read(&self, buf: [u8;1024]){
+        pub fn on_read(&self, buf: &[u8;1024]){
             println!("On Read");
         }
     }
@@ -76,8 +76,9 @@ pub mod client{
                         {
                             let mut data = self.data.lock().unwrap();
                             (*data).id=1;
+                            (*data).recv_buffer=buffer;
                             println!("Client run {}",(*data).id);
-                            self.on_read((*data).recv_buffer);
+                            self.on_read(&(*data).recv_buffer);
                         }
                         
                     }
