@@ -2,6 +2,8 @@ pub mod listener{
     use crate::worker::worker::Worker;
     use crate::worker::worker::Runnable;
     use crate::client::client::Client;
+    use std::net::SocketAddr;
+    use std::str::FromStr;
     //use std::sync::Arc;
     use std::time;
     use std::thread;
@@ -46,9 +48,10 @@ pub mod listener{
 
     impl Runnable for Listener{
         fn new()->Self{
+            let addr: SocketAddr = SocketAddr::from_str("10.85.204.35:1234").unwrap();
             Listener{
                 data: Mutex::new(ListenerData::new()),
-                listener: TcpListener::bind("127.0.0.1:1234").unwrap(),
+                listener: TcpListener::bind(addr).unwrap(),
                 is_running: AtomicBool::new(false),
             }
         }
@@ -61,7 +64,7 @@ pub mod listener{
             
             {
                 let mut data_guard = self.data.lock().unwrap();
-                (*data_guard).id=0;
+                data_guard.id=0;
             }
             
             
@@ -76,7 +79,7 @@ pub mod listener{
                 
                
                 let mut data_guard = self.data.lock().unwrap();
-                (*data_guard).id=(*data_guard).id+1;
+                data_guard.id=data_guard.id+1;
                 println!("*************{}",(*data_guard).id);
                 drop(data_guard);
                 let delay = time::Duration::from_millis(2000); 

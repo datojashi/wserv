@@ -395,6 +395,9 @@ dependencies = [
 [[package]]
 name = "servlib"
 version = "0.1.0"
+dependencies = [
+ "serde",
+]
 
 [[package]]
 name = "sha-1"

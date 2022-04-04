@@ -54,8 +54,8 @@ fn main()
         
         let b =&a.data;
         {
-        let mut data_guard = b.lock().unwrap();
-        (*data_guard).id=(*data_guard).id+1;
+            let mut data_guard = b.lock().unwrap();
+            (*data_guard).id=(*data_guard).id+1;
         }
     }
     

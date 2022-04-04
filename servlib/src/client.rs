@@ -5,16 +5,28 @@
 //use std::sync::Mutex;
 
 
+
+
+
 pub mod client{
 
     //use crate::worker::worker;
     use crate::worker::worker::Runnable;
+    use std::convert::TryInto;
+    use std::iter::FromIterator;
     use std::net::TcpStream;
     use std::sync::Arc;
     use std::sync::Mutex;
     //use std::time;
     use std::io::Read;
+    use std::sync::MutexGuard;
     use std::sync::atomic::{AtomicBool,Ordering};
+    use serde::{Serialize, Deserialize};
+    //use crate::client::CMD1;
+
+    
+    const CMD1: [u8;4] = [0x01,0xaa,0x55,0x01];
+    const CMD2: [u8;4] = [0x01,0xaa,0x55,0x02];
 
     struct ClientData{
         id: u32,
@@ -36,8 +48,37 @@ pub mod client{
     }
 
     impl Client {
-        pub fn on_read(&self, buf: &[u8;1024]){
+        fn on_read(&self, data: &MutexGuard<ClientData>){
             println!("On Read");
+            let cmd: &[u8;4] = &data.recv_buffer[0..4].try_into().unwrap(); 
+            print!("{:?}",cmd);
+            print!("{:?}",CMD1);
+            print!("{:?}",CMD2);
+
+            //*
+            match *cmd {
+                CMD1=>{
+
+                }
+                CMD2=>{
+
+                }
+                _  =>{
+
+                }
+            }
+            //*/
+
+            /*
+            if cmd==CMD1
+            {
+              println!("****************************** YES");  
+            }
+            */
+
+            let ss = &data.recv_buffer[4..12];
+            let s: String = String::from_utf8(ss.to_vec()).unwrap();
+            println!("{}",s);
         }
     }
 
@@ -58,9 +99,9 @@ pub mod client{
                 
                 {
                     let mut data = self.data.lock().unwrap();
-                    (*data).id=1;
-                    println!("Client run {}",(*data).id);
-                    (*data).recv_buffer=[0;1024];
+                    data.id=1;
+                    println!("Client run {}",data.id);
+                    data.recv_buffer=[0;1024];
                 }
                                 
                 
@@ -75,10 +116,10 @@ pub mod client{
                         }
                         {
                             let mut data = self.data.lock().unwrap();
-                            (*data).id=1;
-                            (*data).recv_buffer=buffer;
+                            data.id=1;
+                            data.recv_buffer=buffer;
                             println!("Client run {}",(*data).id);
-                            self.on_read(&(*data).recv_buffer);
+                            self.on_read(&mut data);
                         }
                         
                     }
